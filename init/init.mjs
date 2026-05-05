@@ -106,27 +106,14 @@ updateYaml(hsConfigPathIn, hsConfigPathOut, (doc) => {
   getSet(["tls_letsencrypt_hostname"], process.env.TLS_LETSENCRYPT_HOSTNAME);
 });
 
-/**
- * @param {string | undefined} url
- */
-async function probeHeadscale(url) {
-  if (!url) return;
-  console.log(`Probing Headscale API at: ${url}/swagger.json ...`);
-  try {
-    const controller = new AbortController();
-    const id = setTimeout(() => controller.abort(), 5000);
-    const resp = await fetch(`${url}/swagger.json`, {
-      signal: controller.signal,
-    });
-    clearTimeout(id);
-    console.log(`Probe Result: Status ${resp.status} ${resp.statusText}`);
-    console.log(`Headers: ${JSON.stringify(Object.fromEntries(resp.headers))}`);
-  } catch (e) {
-    // @ts-ignore
-    console.error(`Probe Failed: ${e.message}`);
-  }
+// Verify file content without network probe (which fails before services start)
+if (fs.existsSync(hsConfigPathOut)) {
+  const hsFinal = fs.readFileSync(hsConfigPathOut, "utf8");
+  const match = hsFinal.match(/server_url: .*/);
+  console.log(
+    "Verified Headscale configuration on disk:",
+    match ? match[0] : "server_url not found!",
+  );
 }
-
-await probeHeadscale(process.env.HEADSCALE_URL);
 
 console.log("Configuration updated successfully.");
