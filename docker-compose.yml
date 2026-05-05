@@ -1,18 +1,17 @@
 services:
   config-init:
-    image: node:22-alpine
+    build:
+      context: ./init
+      dockerfile: Dockerfile
     container_name: headplane_config_init
-    working_dir: /app
     networks:
       - headplane-net
     volumes:
       - "./headplane_config.yml:/app/headplane_config.yml:ro"
-      - "./headscale_config.yml:/app/headscale_config.yml:ro"
-      - "./init.mjs:/app/init.mjs:ro"
+      - "./headscale_config.yml:/app/headscale_config.yml:ro"      
       - "shared-configs:/shared"
     env_file:
       - .env
-    command: sh -c "corepack enable pnpm && pnpm add yaml && node /app/init.mjs"
 
   headplane:
     image: ghcr.io/tale/headplane:latest
