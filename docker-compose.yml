@@ -74,11 +74,12 @@ services:
       - "shared-configs:/shared"
       - "./dns_records.json:/etc/headscale/dns_records.json"
       - "headscale-storage:/var/lib/headscale"
-
     env_file:
       - .env
+    environment:
+      - HEADSCALE_CONFIG=/shared/headscale_config.yaml
     healthcheck:
-      test: ["CMD", "headscale", "health"]
+      test: ["CMD", "headscale", "-c", "/shared/headscale_config.yaml", "health"]
       
 networks:
   headplane-net:
