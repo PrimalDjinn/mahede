@@ -1,1 +1,1 @@
-docker exec headscale headscale apikeys create
+docker exec headscale headscale -c /shared/headscale_config.yaml apikeys create

@@ -67,7 +67,7 @@ updateYaml(hpConfigPathIn, hpConfigPathOut, (doc) => {
   console.log(` - headscale.url: ${process.env.HEADSCALE_URL}`);
   console.log(` - headscale.public_url: ${process.env.HEADSCALE_PUBLIC_URL}`);
 
-  const cleanUrl = (url) => (url ? url.replace(/\/+$/, "") : url);
+  const cleanUrl = (/** @type {string | undefined} */ url) => (url ? url.replace(/\/+$/, "") : url);
 
   getSet(["server", "cookie_secret"], process.env.HEADPLANE_SERVER__COOKIE_SECRET);
   getSet(["server", "info_secret"], process.env.HEADPLANE_SERVER__INFO_SECRET);
