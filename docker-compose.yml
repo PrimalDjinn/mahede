@@ -1,0 +1,66 @@
+services:
+  config-init:
+    image: node:22-alpine
+    container_name: headplane_config_init
+    working_dir: /app
+    volumes:
+      - "./headplane_config.yml:/app/headplane_config.yml:ro"
+      - "./headscale_config.yml:/app/headscale_config.yml:ro"
+      - "./init.mjs:/app/init.mjs:ro"
+      - "shared-configs:/shared"
+    env_file:
+      - .env
+    command: sh -c "corepack enable pnpm && pnpm add yaml && node /app/init.mjs"
+
+  headplane:
+    image: ghcr.io/tale/headplane:latest
+    container_name: headplane
+    restart: unless-stopped
+    depends_on:
+      config-init:
+        condition: service_completed_successfully
+    ports:
+      - "3000:3000"
+    volumes:
+      - "shared-configs:/shared"
+      - "headplane-storage:/var/lib/headplane"
+
+      # If you are using dns.extra_records in Headscale (recommended), you
+      # should also mount that file here so Headplane can read and write it.
+      # Ensure that the path matches `headscale.dns_records_path` in your
+      # Headplane config.yaml file.
+      - "./dns_records.json:/etc/headscale/dns_records.json"
+
+      # Read-only access to the Docker socket (or a proxy)
+      - "/var/run/docker.sock:/var/run/docker.sock:ro"
+    environment:
+      - HEADPLANE_CONFIG_PATH=/shared/headplane_config.yaml
+      - HEADPLANE_LOAD_ENV_OVERRIDES=true
+      
+  headscale:
+    image: headscale/headscale:0.28.0
+    container_name: headscale
+    restart: unless-stopped
+    depends_on:
+      config-init:
+        condition: service_completed_successfully
+    command: serve -c /shared/headscale_config.yaml
+    labels:
+      # This label is absolutely necessary to help Headplane find Headscale.
+      me.tale.headplane.target: headscale
+    ports:
+      - "8080:8080"
+      - "127.0.0.1:9090:9090"
+    volumes:
+      - "shared-configs:/shared"
+      - "./dns_records.json:/etc/headscale/dns_records.json"
+
+      - "headscale-storage:/var/lib/headscale"
+
+    env_file:
+      - .env
+
+volumes:
+  headplane-storage:
+  headscale-storage:
+  shared-configs:
