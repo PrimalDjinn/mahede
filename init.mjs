@@ -33,6 +33,11 @@ updateYaml(hpConfigPathIn, hpConfigPathOut, (doc) => {
     }
   };
   
+  console.log(`Writing Headplane Config:`);
+  console.log(` - server.base_url: ${process.env.HEADPLANE_SERVER__BASE_URL}`);
+  console.log(` - headscale.url: ${process.env.HEADSCALE_URL}`);
+  console.log(` - headscale.public_url: ${process.env.HEADSCALE_PUBLIC_URL}`);
+
   getSet(['server', 'cookie_secret'], process.env.HEADPLANE_SERVER__COOKIE_SECRET);
   getSet(['server', 'info_secret'], process.env.HEADPLANE_SERVER__INFO_SECRET);
   getSet(['server', 'base_url'], process.env.HEADPLANE_SERVER__BASE_URL);
