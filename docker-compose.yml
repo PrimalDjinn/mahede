@@ -20,7 +20,7 @@ services:
       config-init:
         condition: service_completed_successfully
       headscale:
-        condition: service_healthy
+        condition: service_started
     expose:
       - 3000
     volumes:
@@ -56,7 +56,6 @@ services:
     volumes:
       - "shared-configs:/shared"
       - "./dns_records.json:/etc/headscale/dns_records.json"
-
       - "headscale-storage:/var/lib/headscale"
 
     env_file:
