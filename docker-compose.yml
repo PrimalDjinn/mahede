@@ -20,7 +20,7 @@ services:
       config-init:
         condition: service_completed_successfully
       headscale:
-        condition: service_started
+        condition: service_healthy
     expose:
       - 3000
     volumes:
@@ -60,7 +60,9 @@ services:
 
     env_file:
       - .env
-
+    healthcheck:
+      test: ["CMD", "headscale", "health"]
+      
 volumes:
   headplane-storage:
   headscale-storage:
