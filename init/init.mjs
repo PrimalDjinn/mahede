@@ -67,15 +67,14 @@ updateYaml(hpConfigPathIn, hpConfigPathOut, (doc) => {
   console.log(` - headscale.url: ${process.env.HEADSCALE_URL}`);
   console.log(` - headscale.public_url: ${process.env.HEADSCALE_PUBLIC_URL}`);
 
-  getSet(
-    ["server", "cookie_secret"],
-    process.env.HEADPLANE_SERVER__COOKIE_SECRET,
-  );
+  const cleanUrl = (url) => (url ? url.replace(/\/+$/, "") : url);
+
+  getSet(["server", "cookie_secret"], process.env.HEADPLANE_SERVER__COOKIE_SECRET);
   getSet(["server", "info_secret"], process.env.HEADPLANE_SERVER__INFO_SECRET);
-  getSet(["server", "base_url"], process.env.HEADPLANE_SERVER__BASE_URL);
-  getSet(["headscale", "url"], process.env.HEADSCALE_URL);
+  getSet(["server", "base_url"], cleanUrl(process.env.HEADPLANE_SERVER__BASE_URL));
+  getSet(["headscale", "url"], cleanUrl(process.env.HEADSCALE_URL));
   getSet(["headscale", "api_key"], process.env.HEADSCALE_API_KEY);
-  getSet(["headscale", "public_url"], process.env.HEADSCALE_PUBLIC_URL);
+  getSet(["headscale", "public_url"], cleanUrl(process.env.HEADSCALE_PUBLIC_URL));
 
   // Also update the headscale config path to point to the shared volume
   getSet(["headscale", "config_path"], "/shared/headscale_config.yaml");
