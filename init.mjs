@@ -68,4 +68,21 @@ updateYaml(hsConfigPathIn, hsConfigPathOut, (doc) => {
   getSet(['tls_letsencrypt_hostname'], process.env.TLS_LETSENCRYPT_HOSTNAME);
 });
 
+async function probeHeadscale(url) {
+  if (!url) return;
+  console.log(`Probing Headscale API at: ${url}/swagger.json ...`);
+  try {
+    const controller = new AbortController();
+    const id = setTimeout(() => controller.abort(), 5000);
+    const resp = await fetch(`${url}/swagger.json`, { signal: controller.signal });
+    clearTimeout(id);
+    console.log(`Probe Result: Status ${resp.status} ${resp.statusText}`);
+    console.log(`Headers: ${JSON.stringify(Object.fromEntries(resp.headers))}`);
+  } catch (e) {
+    console.error(`Probe Failed: ${e.message}`);
+  }
+}
+
+await probeHeadscale(process.env.HEADSCALE_URL);
+
 console.log("Configuration updated successfully.");
