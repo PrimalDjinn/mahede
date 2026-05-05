@@ -19,8 +19,8 @@ services:
     depends_on:
       config-init:
         condition: service_completed_successfully
-    ports:
-      - "3000:3000"
+    expose:
+      - 3000
     volumes:
       - "shared-configs:/shared"
       - "headplane-storage:/var/lib/headplane"
@@ -48,9 +48,9 @@ services:
     labels:
       # This label is absolutely necessary to help Headplane find Headscale.
       me.tale.headplane.target: headscale
-    ports:
-      - "8080:8080"
-      - "127.0.0.1:9090:9090"
+    expose:
+      - 8080
+      - 9090
     volumes:
       - "shared-configs:/shared"
       - "./dns_records.json:/etc/headscale/dns_records.json"
