@@ -26,6 +26,13 @@ services:
         condition: service_healthy
     expose:
       - 3000
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.headplane.rule=Host(`head.finueva.com`)"
+      - "traefik.http.routers.headplane.entrypoints=websecure"
+      - "traefik.http.routers.headplane.tls=true"
+      - "traefik.http.routers.headplane.tls.certresolver=letsencrypt"
+      - "traefik.http.services.headplane.loadbalancer.server.port=3000"
     volumes:
       - "shared-configs:/shared"
       - "headplane-storage:/var/lib/headplane"
@@ -53,8 +60,13 @@ services:
         condition: service_completed_successfully
     command: serve -c /shared/headscale_config.yaml
     labels:
-      # This label is absolutely necessary to help Headplane find Headscale.
-      me.tale.headplane.target: headscale
+      - "me.tale.headplane.target=headscale"
+      - "traefik.enable=true"
+      - "traefik.http.routers.headscale.rule=Host(`tail.finueva.com`)"
+      - "traefik.http.routers.headscale.entrypoints=websecure"
+      - "traefik.http.routers.headscale.tls=true"
+      - "traefik.http.routers.headscale.tls.certresolver=letsencrypt"
+      - "traefik.http.services.headscale.loadbalancer.server.port=8080"
     expose:
       - 8080
       - 9090
